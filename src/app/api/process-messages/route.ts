@@ -3,9 +3,9 @@ import connectDB from '@/lib/mongodb';
 import Message from '@/models/Message';
 import Channel from '@/models/Channel';
 import { analyzeSentiment } from '@/lib/sentiment';
-import { getChannelHistory, getUserInfo, getChannelInfo, cleanSlackMessage, parseSlackTimestamp } from '@/lib/slack';
+import { getChannelHistory, getUserInfo, cleanSlackMessage, parseSlackTimestamp } from '@/lib/slack';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     await connectDB();
     
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         results.push({
           channelId: channel.slackChannelId,
           channelName: channel.name,
-          error: error.message
+          error: error instanceof Error ? error.message : 'Unknown error'
         });
       }
     }
