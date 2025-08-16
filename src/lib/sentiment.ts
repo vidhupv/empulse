@@ -111,7 +111,10 @@ Return ONLY valid JSON in this format:
     const responseText = response.content[0].type === 'text' ? response.content[0].text : '';
     
     try {
-      const result = JSON.parse(responseText.trim()) as SentimentResult;
+      // Extract JSON from Claude's response (sometimes includes extra text)
+      const jsonMatch = responseText.match(/\{[^}]*\}/);
+      const jsonText = jsonMatch ? jsonMatch[0] : responseText.trim();
+      const result = JSON.parse(jsonText) as SentimentResult;
       
       // Validate and normalize the result
       const normalizedResult: SentimentResult = {
