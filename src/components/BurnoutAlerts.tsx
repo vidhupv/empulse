@@ -26,45 +26,17 @@ export default function BurnoutAlerts() {
     try {
       setLoading(true);
       
-      // For now, we'll use mock data since we haven't implemented the burnout detection API yet
-      // TODO: Replace with actual API call to /api/burnout/alerts
+      const response = await fetch('/api/dashboard/data?type=burnout');
+      const result = await response.json();
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const mockAlerts: BurnoutAlert[] = [
-        {
-          id: '1',
-          channelId: 'C1234567',
-          channelName: 'dev-team',
-          riskLevel: 'medium',
-          signals: [
-            'Multiple mentions of working late hours',
-            'Increased use of stress-related language',
-            'Decreased positive reactions to messages'
-          ],
-          affectedUsers: 3,
-          detectedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-          severity: 0.65
-        },
-        {
-          id: '2',
-          channelId: 'C7890123',
-          channelName: 'product-team',
-          riskLevel: 'low',
-          signals: [
-            'Slight increase in weekend activity',
-            'Few mentions of tight deadlines'
-          ],
-          affectedUsers: 1,
-          detectedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
-          severity: 0.35
-        }
-      ];
-      
-      setAlerts(mockAlerts);
+      if (response.ok && result.data) {
+        setAlerts(result.data);
+      } else {
+        setAlerts([]);
+      }
     } catch (error) {
       console.error('Error loading burnout alerts:', error);
+      setAlerts([]);
     } finally {
       setLoading(false);
     }

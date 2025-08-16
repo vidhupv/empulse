@@ -26,33 +26,18 @@ export default function SentimentChart({ timeframe }: SentimentChartProps) {
     try {
       setLoading(true);
       
-      // For now, we'll generate mock data since we haven't implemented the aggregation API yet
-      // TODO: Replace with actual API call
-      const days = timeframe === '7d' ? 7 : 30;
-      const mockData: SentimentData[] = [];
+      const response = await fetch(`/api/dashboard/data?type=sentiment&timeframe=${timeframe}`);
+      const result = await response.json();
       
-      for (let i = days - 1; i >= 0; i--) {
-        const date = startOfDay(subDays(new Date(), i));
-        
-        // Generate realistic mock sentiment data
-        const baseScore = 0.6 + (Math.random() - 0.5) * 0.3; // 0.45 - 0.75 range
-        const weekdayBoost = date.getDay() >= 1 && date.getDay() <= 5 ? 0.05 : -0.1; // Weekdays slightly better
-        const mondayDip = date.getDay() === 1 ? -0.05 : 0; // Monday blues
-        const fridayBoost = date.getDay() === 5 ? 0.1 : 0; // Friday happiness
-        
-        const sentiment = Math.max(0.1, Math.min(0.9, baseScore + weekdayBoost + mondayDip + fridayBoost));
-        const messageCount = Math.floor(Math.random() * 50) + 10; // 10-60 messages
-        
-        mockData.push({
-          date: format(date, 'MMM dd'),
-          sentiment: Number(sentiment.toFixed(2)),
-          messageCount
-        });
+      if (response.ok && result.data) {
+        setData(result.data);
+      } else {
+        // If no data available, show empty state
+        setData([]);
       }
-      
-      setData(mockData);
     } catch (error) {
       console.error('Error loading sentiment data:', error);
+      setData([]);
     } finally {
       setLoading(false);
     }
@@ -85,6 +70,18 @@ export default function SentimentChart({ timeframe }: SentimentChartProps) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64 text-center">
+        <div>
+          <div className="text-gray-400 mb-2">📊</div>
+          <p className="text-gray-600 font-medium">No sentiment data available</p>
+          <p className="text-sm text-gray-500">Add messages to monitored channels to see trends</p>
+        </div>
       </div>
     );
   }

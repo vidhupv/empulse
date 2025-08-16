@@ -22,32 +22,22 @@ export default function WeeklyInsights() {
     try {
       setLoading(true);
       
-      // For now, we'll use mock data since we haven't implemented the weekly insights API yet
-      // TODO: Replace with actual API call to /api/insights/weekly
+      const response = await fetch('/api/dashboard/data?type=insights');
+      const result = await response.json();
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockInsights: WeeklyInsight = {
-        weekStart: new Date().toISOString(),
-        overallTrend: 'stable',
-        insights: [
-          "Team communication volume increased by 15% this week, indicating higher engagement",
-          "Positive sentiment spikes on Fridays suggest good work-life balance anticipation", 
-          "Monday sentiment shows slight dips, which is typical but worth monitoring",
-          "Cross-team collaboration in #general channel shows healthy discussion patterns"
-        ],
-        recommendations: [
-          "Consider implementing Monday morning team check-ins to boost early-week morale",
-          "Celebrate Friday wins to maintain positive end-of-week momentum",
-          "Monitor #dev-team channel for technical frustration patterns",
-          "Encourage more social interactions in team channels to build rapport"
-        ]
-      };
-      
-      setInsights(mockInsights);
+      if (response.ok && result.data) {
+        setInsights({
+          weekStart: result.data.weekStart || new Date().toISOString(),
+          overallTrend: result.data.overallTrend || 'stable',
+          insights: result.data.insights || [],
+          recommendations: result.data.recommendations || []
+        });
+      } else {
+        setInsights(null);
+      }
     } catch (error) {
       console.error('Error loading weekly insights:', error);
+      setInsights(null);
     } finally {
       setLoading(false);
     }
