@@ -163,7 +163,7 @@ async function handleReactionEvent(event: any) {
     }
     
     // Update reactions array
-    const reactionIndex = message.reactions.findIndex(r => r.emoji === event.reaction);
+    const reactionIndex = message.reactions.findIndex((r: any) => r.emoji === event.reaction);
     
     if (event.type === 'reaction_added') {
       if (reactionIndex >= 0) {
@@ -185,7 +185,7 @@ async function handleReactionEvent(event: any) {
     }
     
     // Re-analyze sentiment with updated reactions
-    const reactions = message.reactions.map(r => ({ emoji: r.emoji, count: r.count }));
+    const reactions = message.reactions.map((r: any) => ({ emoji: r.emoji, count: r.count }));
     const sentimentResult = await analyzeSentiment(message.content, reactions);
     
     // Update message sentiment
